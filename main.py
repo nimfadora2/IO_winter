@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from PSO import PSO
 
 A = cv2.imread('lena.png',0)
 
@@ -35,7 +36,7 @@ def probab(hist, size):
 
 ### Function to calculate probability distribution to first and second area ###
 def probDistr(prob,s,t):
-	return np.sum(prob[0:s][0:t]),np.sum(prob[s:][t:])
+	return np.sum(prob[:s][:t]),np.sum(prob[s:][t:])
 
 ### Function to calculate dicrete entropy of both areas ###
 def discrEntr(prob,s,t):
@@ -72,16 +73,22 @@ def phi(image,s,t):
 height, width = A.shape
 neigh = neighbors(A)
 
-for i in range(1,height-1):
-	for j in range(1,width-1):
-		if A[i,j] < 237 and neigh[i-1][j-1] < 86:
+s = 137
+t = 138
+max = 0
+position = (0,0)
+max, s,t = PSO(70,5,A, func=phi)
+print(max,s,t)
+for i in range(1,width-1):
+	for j in range(1,height-1):
+		if A[i,j] > s and neigh[i-1][j-1] > t:
 			A[i,j] = 0
-		elif A[i,j] > 237 and neigh[i-1][j-1] > 86:
+		elif A[i,j] < s and neigh[i-1][j-1] < t:
 			A[i,j] = 0
 		else:
 			A[i,j] = 255
 
-print(phi(A,237,86))
 
-cv2.imshow('image',A)
+
+cv2.imshow('I',A)
 cv2.waitKey(0)
