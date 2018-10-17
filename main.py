@@ -18,7 +18,7 @@ def neighbors(image):
 ### Function to calculate two dimensional histogram based on image and neighs table ###
 def hist2D(image,neighs):
 	width, height = image.shape
-	hist = [[0]*255]*255
+	hist = [[0]*256]*256
 
 	for i in range(1, width - 1):
 		for j in range(1, height - 1):
@@ -53,6 +53,8 @@ def discrEntr(prob,s,t):
 
 ### Function to calculate entropy of area ###
 def entropy(H,P):
+	if P == 0:
+		return 0
 	return np.log(P) + H/P
 
 ### Function to calculate phi on given s and t ###
@@ -67,3 +69,19 @@ def phi(image,s,t):
 
 	return H_1 + H_2
 
+height, width = A.shape
+neigh = neighbors(A)
+
+for i in range(1,height-1):
+	for j in range(1,width-1):
+		if A[i,j] < 237 and neigh[i-1][j-1] < 86:
+			A[i,j] = 0
+		elif A[i,j] > 237 and neigh[i-1][j-1] > 86:
+			A[i,j] = 0
+		else:
+			A[i,j] = 255
+
+print(phi(A,237,86))
+
+cv2.imshow('image',A)
+cv2.waitKey(0)
