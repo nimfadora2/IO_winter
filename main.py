@@ -88,7 +88,5 @@ for i in range(1,width-1):
 		else:
 			A[i,j] = 255
 
-
-
 cv2.imshow('I',A)
 cv2.waitKey(0)
