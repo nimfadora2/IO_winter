@@ -7,7 +7,7 @@ A = cv2.imread('lena.png',0)
 
 ### Function to calculate neighbours on image - rowe 0, n-1 are omitted ###
 def neighbors(image):
-	neighs = image[1:-1,1:-1]
+	neighs = np.int_(image[0:-2,0:-2])
 	for i in range (0,2,1):
 		for j in range(0,2,1):
 			if i == 0 and j == 0:
@@ -25,19 +25,23 @@ def neighbors(image):
 	return neighs
 
 ### Function to calculate two dimensional histogram based on image and neighs table ###
-def hist2D(neighs):
-	return np.unique(neighs,return_counts=True)
+def hist2D(image, neighs):
+	width, height = image.shape
+	hist = [[0] * 256] * 256
 
-### Function to calculate probability mass function basen on histogram ###
+	for i in range(1, width - 1):
+		for j in range(1, height - 1):
+			hist[image[i, j]][neighs[i - 1][j - 1]] += 1
+
+	return hist
+
+### Function to calculate probability mass function based on histogram ###
 def probab(hist, size):
-	prob = []
-	for row in hist:
-		prob.append([x/size for x in row])
-	return prob
+	return np.divide(hist, size)
 
 ### Function to calculate probability distribution to first and second area ###
 def probDistr(prob,s,t):
-	return np.sum(prob[:s][:t]),np.sum(prob[s:][t:])
+	return np.sum(prob[:s,:t]),np.sum(prob[s:,t:])
 
 ### Function to calculate dicrete entropy of both areas ###
 def discrEntr(prob,s,t):
@@ -62,10 +66,10 @@ def entropy(H,P):
 ### Function to calculate phi on given s and t ###
 def phi(image,s,t):
 	neighs = neighbors(image)
-	hist = hist2D(neighs)
+	hist = hist2D(image,neighs)
 	prob = probab(hist, image.size)
 	P1, P2 = probDistr(prob, s, t)
-	H1, H2 = discrEntr(prob, s, t)
+	H1, H2 = discrEntr(prob[:3][:4], s, t)
 	H_1 = entropy(H1, P1)
 	H_2 = entropy(H2, P2)
 
@@ -80,9 +84,8 @@ t = 138
 max = 0
 position = (0,0)
 
-
 first = time.time()
-max, s,t = PSO(100,20,A, func=phi)
+max, s,t = PSO(100,5,A, func=phi)
 print('---seconds---',time.time()-first)
 print(max,s,t)
 for i in range(1,width-1):
