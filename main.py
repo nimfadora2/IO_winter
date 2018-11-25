@@ -1,9 +1,11 @@
 import cv2
 import numpy as np
 from PSO import PSO
+from deterministicPSO import deterministicPSO
 import time
-
-A = cv2.imread('lena.png',0)
+import sys
+import json
+import writeResultsToFile as logger
 
 ### Function to calculate neighbours on image - rowe 0, n-1 are omitted ###
 def neighbors(image):
@@ -32,7 +34,6 @@ def hist2D(image, neighs):
 	for i in range(1, width - 1):
 		for j in range(1, height - 1):
 			hist[image[i, j]][neighs[i - 1][j - 1]] += 1
-
 	return hist
 
 ### Function to calculate probability mass function based on histogram ###
@@ -75,27 +76,40 @@ def phi(image,s,t):
 
 	return H_1 + H_2
 
+config_name = "config.json"
+if(len(sys.argv)>1):
+	config_name = sys.argv[1]
+config_file = open(config_name)
+config_data = json.load(config_file)
+config_file.close()
 
-height, width = A.shape
-neigh = neighbors(A)
+image = cv2.imread('lena.png',0)
+height, width = image.shape
+neigh = neighbors(image)
 
-s = 137
-t = 138
-max = 0
-position = (0,0)
+s = config_data['histogram'][0]['s']
+t = config_data['histogram'][0]['t']
 
-first = time.time()
-max, s,t = PSO(100,5,A, func=phi)
-print('---seconds---',time.time()-first)
+deterministic_pso = config_data['testOnDeterministicData']
+pso_start_time = time.time()
+if(deterministic_pso == False):
+	max, s,t = PSO(image, config_data, func=phi)
+else:
+	max, s,t = deterministicPSO(image, config_data, func=phi)
+print('---PSO algorithm duration---', (time.time()-pso_start_time))
+print('max, s, t')
 print(max,s,t)
 for i in range(1,width-1):
 	for j in range(1,height-1):
-		if A[i,j] > s and neigh[i-1][j-1] > t:
-			A[i,j] = 0
-		elif A[i,j] < s and neigh[i-1][j-1] < t:
-			A[i,j] = 0
+		if image[i,j] > s and neigh[i-1][j-1] > t:
+			image[i,j] = 0
+		elif image[i,j] < s and neigh[i-1][j-1] < t:
+			image[i,j] = 0
 		else:
-			A[i,j] = 255
+			image[i,j] = 255
 
-cv2.imshow('I',A)
+score, diff = logger.benchmarkResultImage(image)
+logger.writeResultsToFile(image, score, s, t, config_data);
+
+cv2.imshow('I',image)
 cv2.waitKey(0)

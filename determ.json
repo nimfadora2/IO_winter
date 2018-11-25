@@ -1,0 +1,41 @@
+{
+    "testOnDeterministicData": 1,
+    "histogram": [
+        {
+            "s": 137,
+            "t": 138
+        }
+    ],
+    "psoInit": [
+        {
+            "iterations": 100,
+            "numberOfPartitions": 5,
+            "velocityMax": 2.5,
+            "w": 0.8,
+            "c1": 1.3,
+            "c2": 1.3
+        }
+    ],
+    "particlesPosition": [
+        {
+            "x": 120,
+            "y": 120
+        },
+        {
+            "x": 200,
+            "y": 12
+        },
+        {
+            "x": 12,
+            "y": 210
+        },
+        {
+            "x": 80,
+            "y": 100
+        },
+        {
+            "x": 50,
+            "y": 50
+        }
+    ]
+}

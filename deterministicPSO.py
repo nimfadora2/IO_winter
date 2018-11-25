@@ -1,29 +1,32 @@
 import random
 import numpy as np
+import sys
 import json
 
 random.seed()
 
 ### Initialization of positions ###
-def initPos(image, m):
-	width, height = image.shape
-	particles = []
-	for i in range(m):
-		(x,y) = (random.randint(0,width-1),random.randint(0,height-1))
-		while (x,y) in particles:
-			(x, y) = (random.randint(0, width-1), random.randint(0, height-1))
-		particles.append([x,y])
-	return particles
+def readInitPositionsFromFile(image, m, config_data):
+    width, height = image.shape
+    particles = []
+    for i in range(m):
+        x = config_data['particlesPosition'][i]['x']
+        y = config_data['particlesPosition'][i]['y']
+        if((x in range(0,width)) and (y in range (0,height))):
+            particles.append([x,y])
+        else:
+            sys.exit("Check config file. Init particle position out of range (0,sizeofImage). Program ends. Image [height,width]: ", height, width)
+    return particles
 
 ### Initialization of velocity vector ###
 def initVel(m, V_max):
 	return [(random.uniform(0,V_max),random.uniform(0,V_max)) for i in range(m)]
 
-def PSO(image, config_data, func):
+def deterministicPSO(image, config_data, func):
 	pso_params = config_data['psoInit'][0]
 	number_of_partitions = pso_params['numberOfPartitions']
 	velocity_max = pso_params['velocityMax']
-	positions = initPos(image,number_of_partitions)
+	positions = readInitPositionsFromFile(image,number_of_partitions, config_data)
 	best = [(func(image,elem[0],elem[1]),elem[0],elem[1]) for elem in positions]
 	global_best = max(best, key=lambda x:x[0])
 	vel = initVel(number_of_partitions, velocity_max)
