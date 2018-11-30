@@ -3,6 +3,7 @@ import sys
 import json
 from skimage.measure import compare_ssim
 import cv2
+import os
 
 ### Function to compare pso algorithm results with autothresholded lists of images. ###
 def benchmarkResultImage(image):

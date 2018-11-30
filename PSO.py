@@ -1,6 +1,6 @@
-import random
 import numpy as np
 import json
+from numpy import random
 
 random.seed()
 
@@ -9,7 +9,7 @@ def initPos(image, m):
 	width, height = image.shape
 	particles = []
 	for i in range(m):
-		(x,y) = (random.randint(0,width-1),random.randint(0,height-1))
+		(x,y) = (np.random.randint(0,width-1),random.randint(0,height-1))
 		while (x,y) in particles:
 			(x, y) = (random.randint(0, width-1), random.randint(0, height-1))
 		particles.append([x,y])
